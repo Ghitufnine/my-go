@@ -52,6 +52,10 @@ func (u *AuthUsecase) Login(ctx context.Context, email, password string) (string
 		return "", "", err
 	}
 
+	if user == nil {
+		return "", "", fmt.Errorf("invalid credentials")
+	}
+
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return "", "", fmt.Errorf("invalid credentials")

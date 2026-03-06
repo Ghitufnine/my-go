@@ -1,6 +1,8 @@
 package http
 
 import (
+	"strings"
+
 	"github.com/ghitufnine/my-go/internal/usecase"
 	"github.com/gofiber/fiber/v2"
 )
@@ -14,7 +16,6 @@ func NewAuthHandler(u *usecase.AuthUsecase) *AuthHandler {
 }
 
 func (h *AuthHandler) RegisterRoutes(router fiber.Router) {
-
 	auth := router.Group("/auth")
 
 	auth.Post("/register", h.register)
@@ -64,7 +65,12 @@ func (h *AuthHandler) login(c *fiber.Ctx) error {
 
 func (h *AuthHandler) logout(c *fiber.Ctx) error {
 
-	token := c.Get("Authorization")
+	authHeader := c.Get("Authorization")
+	if authHeader == "" {
+		return c.Status(401).JSON("missing authorization header")
+	}
+
+	token := strings.TrimPrefix(authHeader, "Bearer ")
 
 	err := h.usecase.Logout(c.Context(), token)
 	if err != nil {

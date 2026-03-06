@@ -2,8 +2,10 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/ghitufnine/my-go/internal/domain/entity"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -18,15 +20,18 @@ func NewUserPostgresRepository(db *pgxpool.Pool) *UserPostgresRepository {
 }
 
 func (r *UserPostgresRepository) Create(ctx context.Context, user *entity.User) error {
+
 	query := `
 		INSERT INTO users (id, email, password, created_at)
 		VALUES ($1, $2, $3, $4)
 	`
+
 	_, err := r.db.Exec(ctx, query, user.ID, user.Email, user.Password, user.CreatedAt)
 	return err
 }
 
 func (r *UserPostgresRepository) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
+
 	query := `
 		SELECT id, email, password, created_at
 		FROM users
@@ -34,8 +39,16 @@ func (r *UserPostgresRepository) GetByEmail(ctx context.Context, email string) (
 	`
 
 	var user entity.User
-	err := r.db.QueryRow(ctx, query, email).Scan(&user.ID, &user.Email, &user.Password, &user.CreatedAt)
+
+	err := r.db.QueryRow(ctx, query, email).
+		Scan(&user.ID, &user.Email, &user.Password, &user.CreatedAt)
+
 	if err != nil {
+
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+
 		return nil, err
 	}
 
@@ -43,6 +56,7 @@ func (r *UserPostgresRepository) GetByEmail(ctx context.Context, email string) (
 }
 
 func (r *UserPostgresRepository) GetByID(ctx context.Context, id string) (*entity.User, error) {
+
 	query := `
 		SELECT id, email, password, created_at
 		FROM users
@@ -50,8 +64,16 @@ func (r *UserPostgresRepository) GetByID(ctx context.Context, id string) (*entit
 	`
 
 	var user entity.User
-	err := r.db.QueryRow(ctx, query, id).Scan(&user.ID, &user.Email, &user.Password, &user.CreatedAt)
+
+	err := r.db.QueryRow(ctx, query, id).
+		Scan(&user.ID, &user.Email, &user.Password, &user.CreatedAt)
+
 	if err != nil {
+
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+
 		return nil, err
 	}
 

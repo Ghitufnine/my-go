@@ -1,12 +1,13 @@
 package jwt
 
 import (
+	"os"
 	"time"
 
 	jwtlib "github.com/golang-jwt/jwt/v5"
 )
 
-var secret = []byte("supersecret")
+var secret = []byte(os.Getenv("JWT_SECRET"))
 
 func GenerateAccessToken(userID string) (string, error) {
 
