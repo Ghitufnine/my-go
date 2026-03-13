@@ -1,0 +1,126 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: mygo-postgres
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: clean_arch
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+
+  mongo:
+    image: mongo:7
+    container_name: mygo-mongo
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - mongo_data:/data/db
+
+
+  redis:
+    image: redis:7
+    container_name: mygo-redis
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis_data:/data
+
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: mygo-rabbitmq
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+    volumes:
+      - rabbit_data:/var/lib/rabbitmq
+
+
+  loki:
+    image: grafana/loki:3.0.0
+    container_name: mygo-loki
+
+    command: -config.file=/etc/loki/local-config.yaml
+
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yaml
+
+    ports:
+      - "3100:3100"
+
+
+  promtail:
+    image: grafana/promtail:3.0.0
+    container_name: mygo-promtail
+
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml
+      - /var/log:/var/log
+
+    command: -config.file=/etc/promtail/config.yml
+
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: mygo-grafana
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+
+    container_name: mygo-app
+
+    depends_on:
+      - postgres
+      - mongo
+      - redis
+      - rabbitmq
+
+    env_file:
+      - ../.env
+
+    ports:
+      - "8080:8080"
+
+
+volumes:
+  pg_data:
+  mongo_data:
+  redis_data:
+  rabbit_data:
+  grafana_data:

@@ -104,6 +104,7 @@ func Container() {
 		pg,
 		redisCache,
 		rabbit,
+		logg,
 	)
 
 	logg.Info("server starting on port " + cfg.AppPort)

@@ -1,0 +1,21 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+
+common:
+  path: /loki
+
+storage_config:
+  filesystem:
+    directory: /loki/chunks
+
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h

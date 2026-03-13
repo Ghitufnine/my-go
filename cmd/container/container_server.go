@@ -3,6 +3,7 @@ package container
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"go.uber.org/zap"
 
 	"github.com/ghitufnine/my-go/internal/handler/http"
 	"github.com/ghitufnine/my-go/internal/infrastructure/rabbitmq"
@@ -17,6 +18,7 @@ func SetupContainerServer(
 	pg *pgxpool.Pool,
 	cache repository.CacheRepository,
 	rabbit *rabbitmq.Rabbit,
+	log *zap.Logger,
 ) {
 
 	// Repositories
@@ -55,6 +57,7 @@ func SetupContainerServer(
 	// Router
 	router := routes.NewRouter(
 		app,
+		log,
 		healthHandler,
 		authHandler,
 		categoryHandler,
