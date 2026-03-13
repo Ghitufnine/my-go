@@ -342,4 +342,10 @@ This project demonstrates backend engineering skills including:
 - Docker infrastructure
 - Production-style backend design
 
+## 🧭 Architecture Diagram
+
+![Architecture](docs/architecture.png)
+
+
+
 This repository is used as part of my backend engineering portfolio for global / remote backend roles.
