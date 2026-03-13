@@ -8,6 +8,7 @@ import (
 	"github.com/ghitufnine/my-go/internal/infrastructure/logger"
 	"github.com/ghitufnine/my-go/internal/infrastructure/mongo"
 	"github.com/ghitufnine/my-go/internal/infrastructure/postgres"
+	"github.com/ghitufnine/my-go/internal/infrastructure/rabbitmq"
 	"github.com/ghitufnine/my-go/internal/infrastructure/redis"
 	cache "github.com/ghitufnine/my-go/internal/infrastructure/redis_cache"
 	"github.com/ghitufnine/my-go/internal/infrastructure/server"
@@ -51,6 +52,10 @@ func Container() {
 
 	_ = mongoDB
 
+	logRepo := mongo.NewTransactionLogRepository(
+		mongoDB.Database,
+	)
+
 	// Redis
 	redisClient, err := redis.New(
 		ctx,
@@ -66,6 +71,30 @@ func Container() {
 
 	_ = redisCache
 
+	rabbit, err := rabbitmq.New(
+		cfg.RabbitURL,
+		cfg.RabbitExchange,
+	)
+
+	if err != nil {
+		logg.Fatal("rabbit failed", zap.Error(err))
+	}
+
+	consumer := rabbitmq.NewConsumer(
+		rabbit,
+		logRepo,
+	)
+
+	err = consumer.Start(
+		ctx,
+		"transaction_logs",
+		"#",
+	)
+
+	if err != nil {
+		logg.Fatal("consumer failed", zap.Error(err))
+	}
+
 	// Fiber
 	app := server.New()
 
@@ -73,6 +102,8 @@ func Container() {
 	SetupContainerServer(
 		app,
 		pg,
+		redisCache,
+		rabbit,
 	)
 
 	logg.Info("server starting on port " + cfg.AppPort)

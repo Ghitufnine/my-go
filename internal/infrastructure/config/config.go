@@ -22,13 +22,18 @@ type Config struct {
 	RedisAddr     string
 	RedisPassword string
 	RedisDB       int
+
+	RabbitURL      string
+	RabbitExchange string
 }
 
 func Load() *Config {
 
-	// Load .env file
-	if err := godotenv.Load("../../.env"); err != nil {
-		log.Println("Warning: .env file not found, using defaults")
+	// Load .env file — try project root first, then two levels up (for cmd/api runs)
+	if err := godotenv.Load(".env"); err != nil {
+		if err2 := godotenv.Load("../../.env"); err2 != nil {
+			log.Println("Warning: .env file not found, using defaults")
+		}
 	}
 	return &Config{
 		AppPort: getEnv("APP_PORT", "8080"),
@@ -45,6 +50,9 @@ func Load() *Config {
 		RedisAddr:     getEnv("REDIS_ADDR", "localhost:6379"),
 		RedisPassword: getEnv("REDIS_PASSWORD", ""),
 		RedisDB:       0,
+
+		RabbitURL:      getEnv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/"),
+		RabbitExchange: getEnv("RABBITMQ_EXCHANGE", "events"),
 	}
 }
 

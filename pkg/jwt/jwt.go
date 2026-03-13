@@ -32,3 +32,26 @@ func GenerateRefreshToken(userID string) (string, error) {
 
 	return token.SignedString(secret)
 }
+
+func ParseToken(tokenStr string) (string, error) {
+
+	token, err := jwtlib.Parse(
+		tokenStr,
+		func(token *jwtlib.Token) (interface{}, error) {
+			return secret, nil
+		},
+	)
+
+	if err != nil {
+		return "", err
+	}
+
+	if claims, ok := token.Claims.(jwtlib.MapClaims); ok {
+
+		userID := claims["user_id"].(string)
+
+		return userID, nil
+	}
+
+	return "", err
+}
