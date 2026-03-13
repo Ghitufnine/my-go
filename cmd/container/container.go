@@ -4,21 +4,18 @@ import (
 	"context"
 	"log"
 
-	"github.com/ghitufnine/my-go/internal/handler/http"
 	"github.com/ghitufnine/my-go/internal/infrastructure/config"
 	"github.com/ghitufnine/my-go/internal/infrastructure/logger"
 	"github.com/ghitufnine/my-go/internal/infrastructure/mongo"
 	"github.com/ghitufnine/my-go/internal/infrastructure/postgres"
 	"github.com/ghitufnine/my-go/internal/infrastructure/redis"
 	cache "github.com/ghitufnine/my-go/internal/infrastructure/redis_cache"
-	infraRepo "github.com/ghitufnine/my-go/internal/infrastructure/repository"
 	"github.com/ghitufnine/my-go/internal/infrastructure/server"
-	"github.com/ghitufnine/my-go/internal/routes"
-	"github.com/ghitufnine/my-go/internal/usecase"
 	"go.uber.org/zap"
 )
 
 func Container() {
+
 	ctx := context.Background()
 
 	cfg := config.Load()
@@ -29,7 +26,7 @@ func Container() {
 	}
 	defer logg.Sync()
 
-	// PostgreSQL
+	// Postgres
 	pg, err := postgres.New(
 		ctx,
 		cfg.PostgresHost,
@@ -42,7 +39,7 @@ func Container() {
 		logg.Fatal("postgres connection failed", zap.Error(err))
 	}
 
-	// MongoDB
+	// Mongo
 	mongoDB, err := mongo.New(
 		ctx,
 		cfg.MongoURI,
@@ -52,8 +49,9 @@ func Container() {
 		logg.Fatal("mongo connection failed", zap.Error(err))
 	}
 
-	_ = mongoDB // used later
+	_ = mongoDB
 
+	// Redis
 	redisClient, err := redis.New(
 		ctx,
 		cfg.RedisAddr,
@@ -68,30 +66,14 @@ func Container() {
 
 	_ = redisCache
 
-	// Fiber server
+	// Fiber
 	app := server.New()
 
-	// Repositories
-	healthRepo := infraRepo.NewHealthPostgresRepository(pg)
-	userRepo := infraRepo.NewUserPostgresRepository(pg)
-	refreshTokenRepo := infraRepo.NewRefreshTokenPostgresRepository(pg)
-
-	// Usecases
-	healthUC := usecase.NewHealthUsecase(healthRepo)
-	authUC := usecase.NewAuthUsecase(userRepo, refreshTokenRepo)
-
-	// Handlers
-	healthHandler := http.NewHealthHandler(healthUC)
-	authHandler := http.NewAuthHandler(authUC)
-
-	// Router
-	router := routes.NewRouter(
+	// Setup router + handlers
+	SetupContainerServer(
 		app,
-		healthHandler,
-		authHandler,
+		pg,
 	)
-
-	router.Setup()
 
 	logg.Info("server starting on port " + cfg.AppPort)
 
