@@ -30,6 +30,19 @@ type itemRequest struct {
 	Price      float64 `json:"price"`
 }
 
+// create godoc
+//
+//	@Summary		Create item
+//	@Description	Create a new item
+//	@Tags			items
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body	itemRequest	true	"Item request"
+//	@Success		200	{string}	string	"created"
+//	@Failure		400	{string}	string	"bad request"
+//	@Failure		500	{string}	string	"internal server error"
+//	@Security		BearerAuth
+//	@Router			/items [post]
 func (h *ItemHandler) create(c *fiber.Ctx) error {
 
 	var req itemRequest
@@ -52,6 +65,16 @@ func (h *ItemHandler) create(c *fiber.Ctx) error {
 	return c.JSON("created")
 }
 
+// getAll godoc
+//
+//	@Summary		List items
+//	@Description	Get all items
+//	@Tags			items
+//	@Produce		json
+//	@Success		200	{array}		entity.Item
+//	@Failure		500	{string}	string	"internal server error"
+//	@Security		BearerAuth
+//	@Router			/items [get]
 func (h *ItemHandler) getAll(c *fiber.Ctx) error {
 
 	data, err := h.usecase.GetAll(c.Context())
@@ -62,6 +85,18 @@ func (h *ItemHandler) getAll(c *fiber.Ctx) error {
 	return c.JSON(data)
 }
 
+// getByID godoc
+//
+//	@Summary		Get item by ID
+//	@Description	Get a single item by its ID
+//	@Tags			items
+//	@Produce		json
+//	@Param			id	path	string	true	"Item ID"
+//	@Success		200	{object}	entity.Item
+//	@Failure		404	{string}	string	"not found"
+//	@Failure		500	{string}	string	"internal server error"
+//	@Security		BearerAuth
+//	@Router			/items/{id} [get]
 func (h *ItemHandler) getByID(c *fiber.Ctx) error {
 
 	id := c.Params("id")
@@ -82,6 +117,20 @@ func (h *ItemHandler) getByID(c *fiber.Ctx) error {
 	return c.JSON(data)
 }
 
+// update godoc
+//
+//	@Summary		Update item
+//	@Description	Update an item by ID
+//	@Tags			items
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path	string		true	"Item ID"
+//	@Param			body	body	itemRequest	true	"Item request"
+//	@Success		200	{string}	string	"updated"
+//	@Failure		400	{string}	string	"bad request"
+//	@Failure		500	{string}	string	"internal server error"
+//	@Security		BearerAuth
+//	@Router			/items/{id} [put]
 func (h *ItemHandler) update(c *fiber.Ctx) error {
 
 	id := c.Params("id")
@@ -107,6 +156,17 @@ func (h *ItemHandler) update(c *fiber.Ctx) error {
 	return c.JSON("updated")
 }
 
+// delete godoc
+//
+//	@Summary		Delete item
+//	@Description	Delete an item by ID
+//	@Tags			items
+//	@Produce		json
+//	@Param			id	path	string	true	"Item ID"
+//	@Success		200	{string}	string	"deleted"
+//	@Failure		500	{string}	string	"internal server error"
+//	@Security		BearerAuth
+//	@Router			/items/{id} [delete]
 func (h *ItemHandler) delete(c *fiber.Ctx) error {
 
 	id := c.Params("id")

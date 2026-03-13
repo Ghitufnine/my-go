@@ -330,6 +330,53 @@ Zap
 
 ---
 
+## 📖 API Documentation (Swagger)
+
+This project uses [swaggo/swag](https://github.com/swaggo/swag) to generate interactive API documentation.
+
+### Access Swagger UI
+
+Once the server is running, open:
+
+```
+http://localhost:8080/swagger/index.html
+```
+
+### Regenerate Docs
+
+After modifying handler annotations, regenerate the docs with:
+
+```bash
+swag init -g cmd/api/main.go -o docs
+```
+
+### Authentication in Swagger
+
+1. Call `POST /api/auth/login` to get an `access_token`
+2. Click the **Authorize** button (🔒) in the top right
+3. Enter `Bearer <your_access_token>`
+4. All protected endpoints will now include the token automatically
+
+### Endpoints covered
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | /api/health | No | Health check |
+| POST | /api/auth/register | No | Register user |
+| POST | /api/auth/login | No | Login & get tokens |
+| POST | /api/auth/logout | No | Logout |
+| GET | /api/categories | Yes | List categories |
+| POST | /api/categories | Yes | Create category |
+| PUT | /api/categories/:id | Yes | Update category |
+| DELETE | /api/categories/:id | Yes | Delete category |
+| GET | /api/items | Yes | List items |
+| POST | /api/items | Yes | Create item |
+| GET | /api/items/:id | Yes | Get item by ID |
+| PUT | /api/items/:id | Yes | Update item |
+| DELETE | /api/items/:id | Yes | Delete item |
+
+---
+
 ## 🎯 Purpose
 
 This project demonstrates backend engineering skills including:

@@ -27,6 +27,19 @@ type categoryRequest struct {
 	Name string `json:"name"`
 }
 
+// create godoc
+//
+//	@Summary		Create category
+//	@Description	Create a new category
+//	@Tags			categories
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body	categoryRequest	true	"Category request"
+//	@Success		200	{string}	string	"created"
+//	@Failure		400	{string}	string	"bad request"
+//	@Failure		500	{string}	string	"internal server error"
+//	@Security		BearerAuth
+//	@Router			/categories [post]
 func (h *CategoryHandler) create(c *fiber.Ctx) error {
 
 	var req categoryRequest
@@ -47,6 +60,16 @@ func (h *CategoryHandler) create(c *fiber.Ctx) error {
 	return c.JSON("created")
 }
 
+// getAll godoc
+//
+//	@Summary		List categories
+//	@Description	Get all categories
+//	@Tags			categories
+//	@Produce		json
+//	@Success		200	{array}		entity.Category
+//	@Failure		500	{string}	string	"internal server error"
+//	@Security		BearerAuth
+//	@Router			/categories [get]
 func (h *CategoryHandler) getAll(c *fiber.Ctx) error {
 
 	data, err := h.usecase.GetAll(c.Context())
@@ -57,6 +80,20 @@ func (h *CategoryHandler) getAll(c *fiber.Ctx) error {
 	return c.JSON(data)
 }
 
+// update godoc
+//
+//	@Summary		Update category
+//	@Description	Update a category by ID
+//	@Tags			categories
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path	string			true	"Category ID"
+//	@Param			body	body	categoryRequest	true	"Category request"
+//	@Success		200	{string}	string	"updated"
+//	@Failure		400	{string}	string	"bad request"
+//	@Failure		500	{string}	string	"internal server error"
+//	@Security		BearerAuth
+//	@Router			/categories/{id} [put]
 func (h *CategoryHandler) update(c *fiber.Ctx) error {
 
 	id := c.Params("id")
@@ -80,6 +117,17 @@ func (h *CategoryHandler) update(c *fiber.Ctx) error {
 	return c.JSON("updated")
 }
 
+// delete godoc
+//
+//	@Summary		Delete category
+//	@Description	Delete a category by ID
+//	@Tags			categories
+//	@Produce		json
+//	@Param			id	path	string	true	"Category ID"
+//	@Success		200	{string}	string	"deleted"
+//	@Failure		500	{string}	string	"internal server error"
+//	@Security		BearerAuth
+//	@Router			/categories/{id} [delete]
 func (h *CategoryHandler) delete(c *fiber.Ctx) error {
 
 	id := c.Params("id")

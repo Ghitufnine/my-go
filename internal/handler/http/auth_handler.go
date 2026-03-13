@@ -28,6 +28,18 @@ type registerRequest struct {
 	Password string `json:"password"`
 }
 
+// register godoc
+//
+//	@Summary		Register a new user
+//	@Description	Create a new user account with email and password
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body	registerRequest	true	"Register request"
+//	@Success		200	{string}	string					"registered"
+//	@Failure		400	{string}	string					"bad request"
+//	@Failure		500	{string}	string					"internal server error"
+//	@Router			/auth/register [post]
 func (h *AuthHandler) register(c *fiber.Ctx) error {
 
 	var req registerRequest
@@ -44,6 +56,18 @@ func (h *AuthHandler) register(c *fiber.Ctx) error {
 	return c.JSON("registered")
 }
 
+// login godoc
+//
+//	@Summary		Login
+//	@Description	Authenticate user and return access + refresh tokens
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body	registerRequest	true	"Login request"
+//	@Success		200	{object}	map[string]string			"access_token and refresh_token"
+//	@Failure		400	{string}	string						"bad request"
+//	@Failure		401	{string}	string						"unauthorized"
+//	@Router			/auth/login [post]
 func (h *AuthHandler) login(c *fiber.Ctx) error {
 
 	var req registerRequest
@@ -63,6 +87,17 @@ func (h *AuthHandler) login(c *fiber.Ctx) error {
 	})
 }
 
+// logout godoc
+//
+//	@Summary		Logout
+//	@Description	Invalidate the current access token
+//	@Tags			auth
+//	@Produce		json
+//	@Param			Authorization	header	string	true	"Bearer <token>"
+//	@Success		200	{string}	string	"logout success"
+//	@Failure		401	{string}	string	"missing authorization header"
+//	@Failure		500	{string}	string	"internal server error"
+//	@Router			/auth/logout [post]
 func (h *AuthHandler) logout(c *fiber.Ctx) error {
 
 	authHeader := c.Get("Authorization")

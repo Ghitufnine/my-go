@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 	"go.uber.org/zap"
 
 	"github.com/ghitufnine/my-go/internal/handler/http"
@@ -38,6 +39,9 @@ func NewRouter(
 func (r *Router) Setup() {
 	r.App.Use(middleware.RequestID())
 	r.App.Use(middleware.Logger(r.Log))
+
+	// Swagger UI
+	r.App.Get("/swagger/*", fiberSwagger.WrapHandler)
 
 	api := r.App.Group("/api")
 
