@@ -1,23 +1,32 @@
-# MyGo Clean Architecture Backend
+# Go Clean Architecture Backend Service
 
-Production-style backend service built with Golang using Clean Architecture, PostgreSQL, MongoDB, Redis, RabbitMQ, and Grafana stack.
+Production-style backend service built with **Golang** using Clean Architecture, PostgreSQL, MongoDB, Redis, RabbitMQ, and Grafana stack.
 
-This project demonstrates a scalable backend structure with:
+This project demonstrates how to build a **scalable, event-driven, production-ready backend service** with proper architecture, caching, messaging, and logging.
 
-- Clean Architecture
-- Event-driven logging
-- Redis caching
-- JWT authentication
-- RabbitMQ messaging
-- MongoDB transaction logs
-- Docker compose infrastructure
-- Loki + Promtail + Grafana logging
+This repository is part of my backend engineering portfolio.
 
 ---
 
-# Architecture
+## 🚀 Features
 
-This project follows Clean Architecture.
+- Clean Architecture
+- REST API with Fiber
+- JWT Authentication
+- Redis caching
+- RabbitMQ event messaging
+- MongoDB transaction logs
+- PostgreSQL main database
+- Docker Compose infrastructure
+- Loki + Promtail + Grafana logging
+- Event-driven backend flow
+- Cache invalidation strategy
+
+---
+
+## 🧠 Architecture
+
+This project follows **Clean Architecture** principles.
 
 
 Handler → Usecase → Repository(interface) → Infrastructure
@@ -35,36 +44,33 @@ Rules:
 
 ---
 
-# Project Structure
+## 📂 Project Structure
 
 
 cmd/
 api/
-main.go
-container/
-container.go
-container_server.go
 
 internal/
-domain/entity
-repository
-usecase
-handler/http
-routes
-middleware
+domain/
+entity/
+repository/
+usecase/
+handler/http/
+routes/
+middleware/
 
 infrastructure/
-postgres
-mongo
-redis
-redis_cache
-rabbitmq
-logger
-config
+postgres/
+mongo/
+redis/
+redis_cache/
+rabbitmq/
+logger/
+config/
 
 pkg/
-jwt
-utils
+jwt/
+utils/
 
 docker/
 docker-compose.yml
@@ -75,9 +81,16 @@ Dockerfile
 .env
 
 
+Goal:
+
+- maintainable
+- scalable
+- production ready
+- easy to extend
+
 ---
 
-# Tech Stack
+## 🛠 Tech Stack
 
 - Golang + Fiber
 - PostgreSQL (main DB)
@@ -89,9 +102,7 @@ Dockerfile
 
 ---
 
-# Features
-
-## Authentication
+## 🔐 Authentication
 
 - Register
 - Login (JWT)
@@ -99,35 +110,39 @@ Dockerfile
 - Logout (invalidate refresh token)
 - JWT middleware
 
-## Categories
+---
+
+## 📦 Categories API
 
 - Create
 - List
 - Update
 - Delete
 
-## Items
+---
+
+## 📦 Items API
 
 - Create
 - List
-- Get detail
+- Detail
 - Update
 - Delete
 
 Rules:
 
 - Item belongs to Category
-- FK enforced
-- Cache for list endpoints
+- Foreign key enforced
+- Cache used for list endpoints
 
-## Redis Cache
+---
 
-Cached:
+## ⚡ Redis Cache
 
+Cached endpoints:
 
-GET /categories
-GET /items
-
+- GET /categories
+- GET /items
 
 TTL: 60s
 
@@ -137,23 +152,24 @@ Invalidated on:
 - update
 - delete
 
-## RabbitMQ Events
+---
 
-Published:
+## 📡 RabbitMQ Events
 
+Published events:
 
-category.created
-category.updated
-category.deleted
+- category.created
+- category.updated
+- category.deleted
+- item.created
+- item.updated
+- item.deleted
 
-item.created
-item.updated
-item.deleted
+---
 
+## 🗄 MongoDB Logs
 
-## Mongo Logs
-
-Consumer writes to:
+Consumer writes logs to:
 
 
 clean_arch_logs.transaction_logs
@@ -161,38 +177,41 @@ clean_arch_logs.transaction_logs
 
 Fields:
 
+- id
+- topic
+- payload
+- created_at
 
-id
-topic
-payload
-created_at
+---
+
+## 📊 Logging Stack
+
+Structured logging using zap.
+
+Flow:
 
 
-## Logging
-
-Structured JSON logs using zap.
-
-Sent to:
-
-
-stdout → promtail → loki → grafana
+App → stdout → promtail → loki → grafana
 
 
 ---
 
-# Requirements
+## ⚙️ Requirements
 
 Install:
 
 - Go 1.22+
 - Docker
 - Docker Compose
-- Postman (optional)
-- MongoDB Compass (optional)
+
+Optional:
+
+- Postman
+- MongoDB Compass
 
 ---
 
-# Environment
+## 🔧 Environment
 
 Create `.env`
 
@@ -222,7 +241,7 @@ When using docker, change host to service name.
 
 ---
 
-# Running with Docker
+## 🐳 Run with Docker
 
 
 cd docker
@@ -231,16 +250,14 @@ docker compose up -d
 
 Services:
 
-
-postgres
-mongo
-redis
-rabbitmq
-grafana
-loki
-promtail
-app
-
+- postgres
+- mongo
+- redis
+- rabbitmq
+- grafana
+- loki
+- promtail
+- app
 
 Check:
 
@@ -260,16 +277,14 @@ admin / admin
 
 ---
 
-# Running without Docker
+## ▶ Run without Docker
 
 Start manually:
 
-
-postgres
-mongo
-redis
-rabbitmq
-
+- postgres
+- mongo
+- redis
+- rabbitmq
 
 Then:
 
@@ -279,80 +294,7 @@ go run cmd/api/main.go
 
 ---
 
-# Database Migration
-
-Run manually in PostgreSQL:
-
-
-CREATE TABLE users (
-id UUID PRIMARY KEY,
-email TEXT UNIQUE NOT NULL,
-password TEXT NOT NULL,
-created_at TIMESTAMP
-);
-
-CREATE TABLE refresh_tokens (
-id UUID PRIMARY KEY,
-user_id UUID REFERENCES users(id),
-token TEXT,
-expires_at TIMESTAMP
-);
-
-CREATE TABLE categories (
-id UUID PRIMARY KEY,
-name TEXT,
-created_at TIMESTAMP
-);
-
-CREATE TABLE items (
-id UUID PRIMARY KEY,
-category_id UUID REFERENCES categories(id),
-name TEXT,
-price NUMERIC,
-created_at TIMESTAMP
-);
-
-
-MongoDB auto creates collection.
-
-Redis auto creates keys.
-
-RabbitMQ auto creates exchange.
-
----
-
-# API Endpoints
-
-## Auth
-
-POST /api/auth/register
-POST /api/auth/login
-POST /api/auth/logout
-
-## Categories
-
-POST /api/categories
-GET /api/categories
-PUT /api/categories/:id
-DELETE /api/categories/:id
-
-## Items
-
-POST /api/items
-GET /api/items
-GET /api/items/:id
-PUT /api/items/:id
-DELETE /api/items/:id
-
-Authorization:
-
-
-Authorization: Bearer TOKEN
-
-
----
-
-# Event Flow
+## 🔄 Event Flow
 
 
 Handler
@@ -365,31 +307,39 @@ Handler
 
 ---
 
-# Cache Flow
+## 💾 Cache Flow
 
 
 Usecase
-→ CacheDecorator
+→ Cache decorator
 → Redis
-→ Postgres
+→ PostgreSQL
 
 
 ---
 
-# Logging Flow
+## 📈 Logging Flow
 
 
-Zap → stdout → promtail → loki → grafana
+Zap
+→ stdout
+→ promtail
+→ loki
+→ grafana
 
 
 ---
 
-# Notes
+## 🎯 Purpose
 
-This project is for learning and demonstration of:
+This project demonstrates backend engineering skills including:
 
 - Clean Architecture
-- Distributed backend
-- Event-driven design
-- Production logging
-- Docker infra
+- Event-driven backend
+- Redis caching strategy
+- Message queue integration
+- Structured logging
+- Docker infrastructure
+- Production-style backend design
+
+This repository is used as part of my backend engineering portfolio for global / remote backend roles.
